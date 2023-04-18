@@ -104,7 +104,7 @@ public class ProfileScreenFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        readGames();
+        //readGames();
     }
 
     @Override

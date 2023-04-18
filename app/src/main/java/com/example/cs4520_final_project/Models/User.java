@@ -105,4 +105,13 @@ public class User {
     public void setFriend(ArrayList<String> friend) {
         this.friend = friend;
     }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "uid='" + uid + '\'' +
+                ", name='" + name + '\'' +
+                ", user_name='" + user_name + '\'' +
+                '}';
+    }
 }

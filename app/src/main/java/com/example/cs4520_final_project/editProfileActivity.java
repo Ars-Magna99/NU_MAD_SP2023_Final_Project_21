@@ -256,10 +256,6 @@ public class editProfileActivity extends AppCompatActivity {
                         Glide.with(editProfileActivity.this).load(mUri).into(avatar_imageView);
 
 
-
-
-
-
                         pd.dismiss();
 
                     }else{

@@ -36,11 +36,13 @@ public class FriendScreen_User_Adapter extends RecyclerView.Adapter<FriendScreen
     private Context mContext;
     private String TAG = "FINAL";
 
-    private ArrayList<User> friends;
+    ArrayList<User> friends = new ArrayList<User>();
 
     private FirebaseAuth mAuth;
     private FirebaseUser mUser;
     private DatabaseReference reference;
+    OnTextClickListener listener;
+
 
 
 
@@ -75,7 +77,9 @@ public class FriendScreen_User_Adapter extends RecyclerView.Adapter<FriendScreen
                 //delete the value from local
                 int current_position = holder.getAdapterPosition();
                 friends.remove(current_position);
+                listener.onTextClick(friends);////////////////////////
                 notifyDataSetChanged();
+                Log.d("clicked delete !!!!!!!!!", "onClick: ");
                 Log.d("final", "onClick delete: " + friends);
 
                 curr_act.runOnUiThread(new Runnable() {
@@ -98,13 +102,15 @@ public class FriendScreen_User_Adapter extends RecyclerView.Adapter<FriendScreen
                 reference.addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        friends.clear();
+                        //friends.clear();
                         for(DataSnapshot uid:snapshot.getChildren()){
                             if(uid.getValue().equals(curr_user.getUid())){
                                 uid.getRef().removeValue();
+                                //friends.remove(current_position);
                                 //notifyDataSetChanged();
                             }
                         }
+                        //notifyDataSetChanged();
                     }
 
                     @Override
@@ -123,6 +129,7 @@ public class FriendScreen_User_Adapter extends RecyclerView.Adapter<FriendScreen
                         Toast.makeText(view.getContext(),"Successfully deleted a friend!",Toast.LENGTH_SHORT ).show();
                     }
                 });**/
+                //notifyDataSetChanged();
 
 
 
@@ -162,12 +169,31 @@ public class FriendScreen_User_Adapter extends RecyclerView.Adapter<FriendScreen
         return friends.size();
     }
 
+    @Override
+    public long getItemId(int position) {
+        return position;
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        return position;
+    }
+
+    @Override
+    public void setHasStableIds(boolean hasStableIds) {
+        super.setHasStableIds(hasStableIds);
+    }
+
     public void setmContext(Context mContext) {
         this.mContext = mContext;
     }
 
     public void setFriends(ArrayList<User> friends) {
         this.friends = friends;
+    }
+
+    public void setListener(OnTextClickListener listener) {
+        this.listener = listener;
     }
 
 
@@ -187,4 +213,9 @@ public class FriendScreen_User_Adapter extends RecyclerView.Adapter<FriendScreen
             delete_btn = itemView.findViewById(R.id.delete_btn_friendScreen);
         }
     }
+
+    public interface OnTextClickListener {
+        void onTextClick(ArrayList<User> new_friends);
+    }
+
 }

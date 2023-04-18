@@ -34,12 +34,12 @@ import java.util.ArrayList;
  * Use the {@link FriendsScreenFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class FriendsScreenFragment extends Fragment {
+public class FriendsScreenFragment extends Fragment implements FriendScreen_User_Adapter.OnTextClickListener {
     private FirebaseAuth mAuth;
     private FirebaseUser currentUser;
 
     private ArrayList<User> friends;
-    private ArrayList<String> friends_uid;
+    private ArrayList<String> friends_uid = new ArrayList<String>();
 
     private RecyclerView friends_list_recycler;
     private FriendScreen_User_Adapter friend_adapter;
@@ -86,17 +86,15 @@ public class FriendsScreenFragment extends Fragment {
         }
         mAuth = FirebaseAuth.getInstance();
         currentUser = mAuth.getCurrentUser();
-        DatabaseReference friends_reference = FirebaseDatabase.getInstance().getReference("Registered Users").child(currentUser.getUid()).child("friend");
-        friends_reference.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<DataSnapshot> task) {
-                friends_uid = (ArrayList<String>) task.getResult().getValue();
-                Log.d("final", "onComplete: "+friends_uid);
-            }
-        });
-        readFriends();
 
+        //readFriends();
 
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        //friend_adapter.notifyDataSetChanged();
     }
 
     @Override
@@ -109,7 +107,36 @@ public class FriendsScreenFragment extends Fragment {
 
         friends_list_recycler = rootView.findViewById(R.id.recyclerView_friends);
         friends_list_recycler.setLayoutManager(new LinearLayoutManager(getContext()));
-        //readFriends();
+        friends_list_recycler.setAdapter(friend_adapter);
+
+        DatabaseReference friends_reference = FirebaseDatabase.getInstance().getReference("Registered Users").child(currentUser.getUid()).child("friend");
+        /**
+        friends_reference.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DataSnapshot> task) {
+                friends_uid = (ArrayList<String>) task.getResult().getValue();
+                Log.d("final", "onComplete: "+friends_uid);
+            }
+        });**/
+        friends_reference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                friends_uid.clear();
+                for(DataSnapshot snap : snapshot.getChildren()){
+                    String uid = snap.getValue(String.class);
+                    friends_uid.add(uid);
+                    Log.d("final", "onCreateView of Friends Fragment"+friends_uid);
+                }
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+        readFriends();
         return rootView;
     }
 
@@ -120,6 +147,7 @@ public class FriendsScreenFragment extends Fragment {
         user_ref.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
+                friends.clear();
                 for(DataSnapshot snap: snapshot.getChildren()){
                     User user = snap.getValue(User.class);
                     assert  user != null;
@@ -128,10 +156,12 @@ public class FriendsScreenFragment extends Fragment {
                         friends.add(user);
                     }
                 }
+                Log.d("friend uid list: ", String.valueOf(friends_uid));
                 Log.d("TAG", "friends to pass into Friend Screen: " + friends);
                 FriendScreen_User_Adapter userAdapter = new FriendScreen_User_Adapter(getContext(),friends);
-                //userAdapter.setmContext(getActivity());
+                userAdapter.setListener(FriendsScreenFragment.this::onTextClick);
                 friends_list_recycler.setAdapter(userAdapter);
+                userAdapter.notifyDataSetChanged();
             }
 
             @Override
@@ -141,5 +171,13 @@ public class FriendsScreenFragment extends Fragment {
         });
 
 
+    }
+
+    @Override
+    public void onTextClick(ArrayList<User> new_friends) {
+        friends = new_friends;
+        Log.d("Transfer data ", "onTextClick: "+this.friends);
+        //friend_adapter.notifyDataSetChanged();
+        readFriends();
     }
 }

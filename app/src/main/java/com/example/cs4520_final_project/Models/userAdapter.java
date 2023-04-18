@@ -109,7 +109,7 @@ public class userAdapter extends RecyclerView.Adapter<userAdapter.ViewHolder> {
                             Log.d(TAG, "onComplete: "+newFriendsList.size());
                             newFriendsList.add(id);
                             ref.setValue(newFriendsList);
-                            Toast.makeText(view.getContext(), "it is added!", Toast.LENGTH_LONG).show();
+                            Toast.makeText(view.getContext(), "A new friend is added!", Toast.LENGTH_LONG).show();
 
                         }
                     }

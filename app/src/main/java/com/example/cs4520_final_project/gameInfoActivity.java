@@ -40,9 +40,10 @@ public class gameInfoActivity extends AppCompatActivity  {
     private DatabaseReference ref;
     private String gameName;
 
-    private TextView game_title,player_number;
+    private TextView game_title,player_number,publisher,developer,steam_id;
     private ImageView game_banner;
     private Button go_back_button;
+
 
 
     @Override
@@ -60,6 +61,9 @@ public class gameInfoActivity extends AppCompatActivity  {
         game_banner = findViewById(R.id.game_banner_info);
         game_title = findViewById(R.id.game_title_info);
         player_number = findViewById(R.id.number_of_player);
+        developer = findViewById(R.id.developer_game_info);
+        publisher = findViewById(R.id.publisher_game_info);
+        steam_id = findViewById(R.id.appid_game_info);
 
         Glide.with(gameInfoActivity.this).load(curr_game.image_URL).into(game_banner);
         game_title.setText(curr_game.getName());
@@ -72,6 +76,9 @@ public class gameInfoActivity extends AppCompatActivity  {
                 Game curr_game = snapshot.getValue(Game.class);
                 int player_num = curr_game.getPlayer_number();
                 player_number.setText(String.valueOf(player_num));
+                developer.setText("Developer: "+curr_game.developer);
+                publisher.setText("Publisher: "+curr_game.publisher);
+                steam_id.setText("Steam ID: "+String.valueOf(curr_game.app_id));
             }
 
             @Override
